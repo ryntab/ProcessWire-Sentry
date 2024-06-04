@@ -1,0 +1,57 @@
+# Ignore Composer dependencies
+/vendor/
+
+# Ignore sensitive files
+.env
+.env.local
+.env.*.local
+
+# Ignore log files
+*.log
+
+# Ignore cache and session files
+/cache/
+/storage/
+
+# Ignore IDE and editor-specific files
+/.idea/
+/.vscode/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore PHPStorm meta files
+/.phpstorm.meta.php
+
+# Ignore PHPUnit result files
+phpunit.xml
+phpunit.xml.dist
+
+# Ignore coverage reports
+coverage/
+coverage.xml
+
+# Ignore node modules if using Node.js
+/node_modules/
+
+# Ignore built assets
+/public/build/
+/public/css/
+/public/js/
+/public/images/
+
+# Ignore compiled templates
+/templates_c/
+
+# Ignore static analysis tool files
+/.php_cs.cache
+/.php_cs
+
+# Ignore deployment scripts
+/deploy/
+
+# Ignore backups and other files
+*.bak
+*.swp
+*.swo
