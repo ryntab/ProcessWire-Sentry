@@ -3,38 +3,10 @@
 namespace ProcessWire;
 
 // Include Composer's autoload file
-require_once (__DIR__ . '/vendor/autoload.php');
+require_once(__DIR__ . '/vendor/autoload.php');
 
-// Initialize Sentry
-\Sentry\init([
-    'dsn' => 'https://686d19dc56af9764a3f5e1d59c5ee496@o4505273794166784.ingest.us.sentry.io/4507376269197312',
-    // Specify a fixed sample rate
-    'traces_sample_rate' => 1.0,
-    // Set a sampling rate for profiling - this is relative to traces_sample_rate
-    'profiles_sample_rate' => 1.0,
-  ]);
-
-// Add a check to ensure Sentry is initialized
-// if (\Sentry\SentrySdk::getCurrentHub()->getClient()) {
-//     echo "Sentry initialized successfully.\n";
-// } else {
-//     echo "Sentry initialization failed.\n";
-// }
-
-// Capture a message
-try {
-    \Sentry\captureMessage('Something went wrong');
-    // echo "Message captured successfully.\n";
-} catch (Exception $e) {
-    echo "Failed to capture message: " . $e->getMessage() . "\n";
-}
-
-
-try {
-    $this->functionFailsForSure();
-} catch (\Throwable $exception) {
-    \Sentry\captureException($exception);
-}
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 class ProcessWireSentry extends WireData implements Module
 {
@@ -58,7 +30,31 @@ class ProcessWireSentry extends WireData implements Module
     public function init()
     {
         // Include Composer's autoload file
+        require_once(__DIR__ . '/vendor/autoload.php');
 
+        // Create a logger instance
+        $logger = new Logger('sentry');
+        $logger->pushHandler(new StreamHandler('php://stderr', Logger::DEBUG));
+
+        // Sentry initialization with enhanced logging
+        \Sentry\init([
+            'dsn' => $dsn,
+            'traces_sample_rate' => 1.0,
+            'logger' => $logger,
+        ]);
+
+        // Test sending a message to Sentry
+        // try {
+        //     throw new \Exception('Test exception from ProcessWireSentry module');
+        // } catch (\Exception $e) {
+        //     \Sentry\captureException($e);
+        //     wire('log')->save('sentry', 'Test exception sent to Sentry.');
+        // }
+
+        // \Sentry\captureMessage('Test message from ProcessWireSentry module');
+        // wire('log')->save('sentry', 'Test message sent to Sentry.');
+
+        // Continue with module initialization...
 
         // Get the DSN and traces_sample_rate from the module configuration
         $dsn = $this->wire('modules')->getConfig('ProcessWireSentry', 'dsn');
@@ -71,27 +67,25 @@ class ProcessWireSentry extends WireData implements Module
         }
 
         if (empty($tracesSampleRate)) {
-            wire('log')->save('sentry', 'tDSN is is not set in the configuration');
+            wire('log')->save('sentry', 'traces_sample_rate is not set in the configuration');
             return;
-        }
-
-        // Sentry initialization
-        try {
-            throw new \Exception('Sentry test exception');
-        } catch (\Exception $e) {
-            \Sentry\captureException($e);
-            wire('log')->save('sentry', 'Test exception sent to Sentry.');
         }
 
         wire('log')->save('sentry', 'DSN: ' . $dsn);
         wire('log')->save('sentry', 'Traces Sample Rate: ' . $tracesSampleRate);
 
-        try {
-            \Sentry\captureMessage('Sentry test message');
-            wire('log')->save('sentry', 'Test message sent to Sentry.');
-        } catch (\Exception $e) {
-            wire('log')->save('sentry', 'Failed to send test message: ' . $e->getMessage());
-        }
+        // Sentry re-initialization with the module's configuration
+        \Sentry\init([
+            'dsn' => $dsn,
+            'traces_sample_rate' => (float) $tracesSampleRate,
+            'logger' => $logger,
+        ]);
+
+        wire('log')->save('sentry', 'Sentry re-initialized successfully.');
+
+        // Test sending another message
+        // \Sentry\captureMessage('Another test message after re-initialization');
+        // wire('log')->save('sentry', 'Another test message sent to Sentry.');
 
         // Store previous error and exception handlers
         $this->previousErrorHandler = set_error_handler([$this, 'handleError']);
@@ -202,3 +196,4 @@ class ProcessWireSentry extends WireData implements Module
         }
     }
 }
+
