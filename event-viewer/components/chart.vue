@@ -25,7 +25,7 @@ export default {
     return {
       series: [
         {
-          name: "Event Count",
+          name: "Events",
           data: this.fillMissingTimes(this.data),
           color: "#e69138",
         },

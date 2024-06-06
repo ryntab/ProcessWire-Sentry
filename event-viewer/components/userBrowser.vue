@@ -16,6 +16,14 @@ export default {
           return "logos:chrome";
         case "Chrome":
           return "logos:chrome";
+        case "Firefox":
+          return "logos:firefox";
+        case "Brave":
+          return "logos:brave";
+        case "Microsoft Edge":
+          return "logos:microsoft-edge";
+        case "Safari":
+          return "logos:safari";
         default:
           return "logos:firefox";
       }
