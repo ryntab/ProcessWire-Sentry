@@ -1,13 +1,15 @@
 <template>
   <div>
-    <!-- <div class="flex space-x-4 mb-4">
-      <button @click="setTimeRange('-1h')">1 Hour</button>
-      <button @click="setTimeRange('-6h')">6 Hours</button>
-      <button @click="setTimeRange('-24h')">24 Hours</button>
-      <button @click="setTimeRange('-48h')">48 Hours</button>
-      <button @click="setTimeRange('-7d')">1 Week</button>
-    </div> -->
-    <Chart v-if="events.length > 0" :data="events" />
+    <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20">
+      <button :class="buttonClass" @click="setTimeRange('-1h')">1 Hour</button>
+      <button :class="buttonClass" @click="setTimeRange('-6h')">6 Hours</button>
+      <button :class="buttonClass" @click="setTimeRange('-24h')">24 Hours</button>
+      <button :class="buttonClass" @click="setTimeRange('-48h')">48 Hours</button>
+      <button :class="buttonClass" @click="setTimeRange('-7d')">1 Week</button>
+    </div>
+    <div class="relative h-64">
+      <Chart v-if="events.length > 0" :data="events" />
+    </div>
     <div class="h-[800px] overflow-scroll">
       <div
         class="flex flex-col space-y-4 p-2"
@@ -34,7 +36,6 @@ export default {
   },
   mounted() {
     const runtime = useRuntimeConfig();
-    console.log(runtime.public);
     const container = document.getElementById("sentry-events-container");
 
     if (container) {
@@ -49,9 +50,6 @@ export default {
       this.authToken = runtime.public.SENTRY_AUTH_TOKEN;
     }
 
-    console.log("Test");
-    console.log(this.dsn, this.projectID, this.organizationID, this.authToken);
-
     if (this.dsn && this.projectID && this.organizationID && this.authToken) {
       this.init();
     }
@@ -65,30 +63,32 @@ export default {
       this.getEvents();
     },
     async getEvents() {
-      const endTimestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+      const endTimestamp = new Date().toISOString(); // Current timestamp in ISO format
       let startTimestamp;
 
       switch (this.timeRange) {
         case "-1h":
-          startTimestamp = endTimestamp - 3600; // 1 hour ago
+          startTimestamp = new Date(Date.now() - 3600 * 1000).toISOString(); // 1 hour ago
           break;
         case "-6h":
-          startTimestamp = endTimestamp - 21600; // 6 hours ago
+          startTimestamp = new Date(Date.now() - 6 * 3600 * 1000).toISOString(); // 6 hours ago
           break;
         case "-24h":
-          startTimestamp = endTimestamp - 86400; // 24 hours ago
+          startTimestamp = new Date(Date.now() - 24 * 3600 * 1000).toISOString(); // 24 hours ago
           break;
         case "-48h":
-          startTimestamp = endTimestamp - 172800; // 48 hours ago
+          startTimestamp = new Date(Date.now() - 48 * 3600 * 1000).toISOString(); // 48 hours ago
           break;
         case "-7d":
-          startTimestamp = endTimestamp - 604800; // 7 days ago
+          startTimestamp = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(); // 7 days ago
           break;
         default:
-          startTimestamp = endTimestamp - 86400; // Default to 24 hours ago
+          startTimestamp = new Date(Date.now() - 24 * 3600 * 1000).toISOString(); // Default to 24 hours ago
       }
 
-      const url = `https://sentry.io/api/0/projects/${this.organizationID}/${this.projectID}/events/?start=${startTimestamp}&end=${endTimestamp}`;
+      const url = `https://sentry.io/api/0/projects/${this.organizationID}/${this.projectID}/events/?start=${encodeURIComponent(
+        startTimestamp
+      )}&end=${encodeURIComponent(endTimestamp)}`;
       console.log("Fetching events with URL:", url);
 
       try {
@@ -109,6 +109,11 @@ export default {
       } catch (error) {
         console.error("Error fetching events:", error);
       }
+    },
+  },
+  computed: {
+    buttonClass() {
+      return "bg-gray-200 text-gray-800 px-2 py-1 rounded-md text-xs";
     },
   },
 };
