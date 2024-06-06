@@ -1,0 +1,35 @@
+name: Generate Nuxt Site
+
+on:
+  push:
+    branches:
+      - main # or your default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd event-viewer
+          npm install
+
+      - name: Generate Nuxt site
+        run: |
+          cd event-viewer
+          npm run generate
+
+      - name: Upload generated site
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-site
+          path: event-viewer/dist
