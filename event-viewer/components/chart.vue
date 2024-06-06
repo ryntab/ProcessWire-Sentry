@@ -10,6 +10,7 @@
   </div>
 </template>
 
+
 <script>
 import moment from "moment";
 
@@ -86,10 +87,6 @@ export default {
         },
         title: {
           text: "Error Events",
-          align: "left",
-        },
-        subtitle: {
-          text: "Events sent to Sentry.io",
           align: "left",
         },
         xaxis: {

@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20">
+    <!-- <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20">
       <button :class="buttonClass" @click="setTimeRange('-1h')">1 Hour</button>
       <button :class="buttonClass" @click="setTimeRange('-6h')">6 Hours</button>
       <button :class="buttonClass" @click="setTimeRange('-24h')">24 Hours</button>
       <button :class="buttonClass" @click="setTimeRange('-48h')">48 Hours</button>
       <button :class="buttonClass" @click="setTimeRange('-7d')">1 Week</button>
-    </div>
+    </div> -->
     <div class="relative h-64">
       <Chart v-if="events.length > 0" :data="events" />
     </div>
