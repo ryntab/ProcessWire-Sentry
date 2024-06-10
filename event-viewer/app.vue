@@ -1,16 +1,32 @@
 <template>
-  <div>
-    <!-- <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20">
-      <button :class="buttonClass" @click="setTimeRange('-1h')">1 Hour</button>
-      <button :class="buttonClass" @click="setTimeRange('-6h')">6 Hours</button>
-      <button :class="buttonClass" @click="setTimeRange('-24h')">24 Hours</button>
-      <button :class="buttonClass" @click="setTimeRange('-48h')">48 Hours</button>
-      <button :class="buttonClass" @click="setTimeRange('-7d')">1 Week</button>
-    </div> -->
-    <div class="relative h-64">
-      <Chart v-if="events.length > 0" :data="events" />
+  <div class="overflow-hidden">
+    <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20 align-middle justify-center">
+      <span class="text-sm">Last</span>
+      <button :class="buttonClass" @click="setTimeRange('24h')">
+        24 Hours
+      </button>
+      <button :class="buttonClass" @click="setTimeRange('14d')">14 Days</button>
+    </div>
+    <div class="relative h-64 w-full">
+      <!-- <Chart v-if="events.length > 0" :data="events" /> -->
+      <IssuesChart v-if="issues.length > 0" :data="issues" :loading="loading" />
     </div>
     <div class="h-[800px] overflow-scroll">
+      <div
+        v-if="!loading"
+        class="flex flex-col space-y-4 p-2"
+        v-for="issue in issues"
+        :key="issue.id"
+      >
+        <IssuesCard :issue="issue" :loading="loading" />
+      </div>
+      <IssuesSkeleton
+        v-else
+        v-for="index of 20"
+        :loading="true"
+      />
+    </div>
+    <!-- <div class="h-[800px] overflow-scroll">
       <div
         class="flex flex-col space-y-4 p-2"
         v-for="event in events"
@@ -18,7 +34,7 @@
       >
         <Event :event="event" />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -31,7 +47,9 @@ export default {
       organizationID: null,
       authToken: null,
       events: [],
-      timeRange: "-24h", // Default time range
+      issues: [],
+      timeRange: "14d", // Default time range
+      loading: false,
     };
   },
   mounted() {
@@ -56,39 +74,35 @@ export default {
   },
   methods: {
     init() {
-      this.getEvents();
+      this.getIssues();
     },
     setTimeRange(range) {
       this.timeRange = range;
-      this.getEvents();
+      this.getIssues();
+    },
+    async getIssues() {
+      this.loading = true;
+      const url = `https://sentry.io/api/0/projects/${this.organizationID}/${this.projectID}/issues/?statsPeriod=${this.timeRange}`;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${this.authToken}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          this.issues = data;
+        } else {
+          console.error("Failed to fetch events:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        this.loading = false;
+      }
     },
     async getEvents() {
-      const endTimestamp = new Date().toISOString(); // Current timestamp in ISO format
-      let startTimestamp;
-
-      switch (this.timeRange) {
-        case "-1h":
-          startTimestamp = new Date(Date.now() - 3600 * 1000).toISOString(); // 1 hour ago
-          break;
-        case "-6h":
-          startTimestamp = new Date(Date.now() - 6 * 3600 * 1000).toISOString(); // 6 hours ago
-          break;
-        case "-24h":
-          startTimestamp = new Date(Date.now() - 24 * 3600 * 1000).toISOString(); // 24 hours ago
-          break;
-        case "-48h":
-          startTimestamp = new Date(Date.now() - 48 * 3600 * 1000).toISOString(); // 48 hours ago
-          break;
-        case "-7d":
-          startTimestamp = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(); // 7 days ago
-          break;
-        default:
-          startTimestamp = new Date(Date.now() - 24 * 3600 * 1000).toISOString(); // Default to 24 hours ago
-      }
-
-      const url = `https://sentry.io/api/0/projects/${this.organizationID}/${this.projectID}/events/?start=${encodeURIComponent(
-        startTimestamp
-      )}&end=${encodeURIComponent(endTimestamp)}`;
+      const url = `https://sentry.io/api/0/projects/${this.organizationID}/${this.projectID}/issues/?statsPeriod=${this.timeRange}`;
       console.log("Fetching events with URL:", url);
 
       try {
