@@ -85,8 +85,7 @@ export default {
           show: false,
         },
         title: {
-          text: "Issues",
-          align: "left",
+          show: false,
         },
         xaxis: {
           show: false,
@@ -144,8 +143,6 @@ export default {
         return acc;
       }, {});
 
-      console.log("Grouped data:", groupedData);
-
       // Determine the start and end dates
       const allDates = Object.values(groupedData).flatMap((dates) =>
         Object.keys(dates)
@@ -153,9 +150,6 @@ export default {
       const startDate = moment.min(allDates.map((d) => moment(d)));
       const endDate = moment.max(allDates.map((d) => moment(d)));
       const filledData = [];
-
-      console.log("Start date:", startDate.toISOString());
-      console.log("End date:", endDate.toISOString());
 
       Object.keys(groupedData).forEach((level) => {
         let currentDate = startDate.clone();

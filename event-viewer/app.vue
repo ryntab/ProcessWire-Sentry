@@ -1,11 +1,16 @@
 <template>
   <div class="overflow-hidden">
-    <div class="flex space-x-2 mb-4 absolute right-0 m-2 z-20 align-middle justify-center">
-      <span class="text-sm">Last</span>
-      <button :class="buttonClass" @click="setTimeRange('24h')">
-        24 Hours
-      </button>
-      <button :class="buttonClass" @click="setTimeRange('14d')">14 Days</button>
+    <div class="flex justify-between absolute right-0 m-2 z-20 align-middle w-full px-4">
+      <div>
+        <span class="font-medium">Issues in the last {{ timeRange }}</span>
+      </div>
+      <div class="space-x-2">
+        <span class="text-sm">Last</span>
+        <span :class="buttonClass" @click="setTimeRange('24h')">
+          24 Hours
+        </span>
+        <span :class="buttonClass" @click="setTimeRange('14d')">14 Days</span>
+      </div>
     </div>
     <div class="relative h-64 w-full">
       <!-- <Chart v-if="events.length > 0" :data="events" /> -->
@@ -20,21 +25,8 @@
       >
         <IssuesCard :issue="issue" :loading="loading" />
       </div>
-      <IssuesSkeleton
-        v-else
-        v-for="index of 20"
-        :loading="true"
-      />
+      <IssuesSkeleton v-else v-for="index of 20" :loading="true" />
     </div>
-    <!-- <div class="h-[800px] overflow-scroll">
-      <div
-        class="flex flex-col space-y-4 p-2"
-        v-for="event in events"
-        :key="event.id"
-      >
-        <Event :event="event" />
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -127,7 +119,7 @@ export default {
   },
   computed: {
     buttonClass() {
-      return "bg-gray-200 text-gray-800 px-2 py-1 rounded-md text-xs";
+      return "bg-gray-200 text-gray-800 px-2 py-1 rounded-md text-xs cursor-pointer";
     },
   },
 };
