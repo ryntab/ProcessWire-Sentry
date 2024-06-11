@@ -3,6 +3,8 @@
 
 This ProcessWire module integrates Sentry error tracking into your ProcessWire site, with additional support for viewing live Sentry events.
 
+## 🚧 This module is not production ready
+
 ## Features
 
 - Configure Sentry DSN, Project ID, Organization ID, and Auth Token.
