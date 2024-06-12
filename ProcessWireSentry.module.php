@@ -3,7 +3,7 @@
 namespace ProcessWire;
 
 // Include Composer's autoload file
-require_once(__DIR__ . '/vendor/autoload.php');
+require_once (__DIR__ . '/vendor/autoload.php');
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -26,11 +26,11 @@ class ProcessWireSentry extends WireData implements Module
             'autoload' => true
         ];
     }
-
+    
     public function init()
     {
         // Include Composer's autoload file
-        require_once(__DIR__ . '/vendor/autoload.php');
+        require_once (__DIR__ . '/vendor/autoload.php');
 
         // Create a logger instance
         $logger = new Logger('sentry');
@@ -39,25 +39,14 @@ class ProcessWireSentry extends WireData implements Module
         // Sentry initialization with enhanced logging
         \Sentry\init([
             'dsn' => $dsn,
-            'traces_sample_rate' => 1.0,
+            'traces_sample_rate' => (float) $tracesSampleRate,
             'logger' => $logger,
         ]);
 
-        // Test sending a message to Sentry
-        // try {
-        //     throw new \Exception('Test exception from ProcessWireSentry module');
-        // } catch (\Exception $e) {
-        //     \Sentry\captureException($e);
-        //     wire('log')->save('sentry', 'Test exception sent to Sentry.');
-        // }
-
-        // \Sentry\captureMessage('Test message from ProcessWireSentry module');
-        // wire('log')->save('sentry', 'Test message sent to Sentry.');
-
-        // Continue with module initialization...
-
         // Get the DSN and traces_sample_rate from the module configuration
         $dsn = $this->wire('modules')->getConfig('ProcessWireSentry', 'dsn');
+        $debug = $this->wire('modules')->getConfig('ProcessWireSentry', 'debug_mode');
+        $localLog = $this->wire('modules')->getConfig('ProcessWireSentry', 'local_log');
         $tracesSampleRate = $this->wire('modules')->getConfig('ProcessWireSentry', 'traces_sample_rate');
 
         // Debug: Check if DSN and traces_sample_rate are being set
@@ -71,21 +60,14 @@ class ProcessWireSentry extends WireData implements Module
             return;
         }
 
-        wire('log')->save('sentry', 'DSN: ' . $dsn);
-        wire('log')->save('sentry', 'Traces Sample Rate: ' . $tracesSampleRate);
-
-        // Sentry re-initialization with the module's configuration
-        \Sentry\init([
-            'dsn' => $dsn,
-            'traces_sample_rate' => (float) $tracesSampleRate,
-            'logger' => $logger,
-        ]);
-
-        wire('log')->save('sentry', 'Sentry re-initialized successfully.');
-
-        // Test sending another message
-        // \Sentry\captureMessage('Another test message after re-initialization');
-        // wire('log')->save('sentry', 'Another test message sent to Sentry.');
+        if ($debug) {
+            try {
+                throw new \Exception('Test exception from ProcessWireSentry module');
+            } catch (\Exception $e) {
+                \Sentry\captureException($e);
+                wire('log')->save('sentry', 'Test exception sent to Sentry.');
+            }
+        }
 
         // Store previous error and exception handlers
         $this->previousErrorHandler = set_error_handler([$this, 'handleError']);
@@ -97,9 +79,6 @@ class ProcessWireSentry extends WireData implements Module
 
         // Hook into WireLog::save to capture error logs
         $this->addHookAfter('WireLog::save', $this, 'captureLogErrors');
-
-        // Debug: Log initialization success
-        // wire('log')->save('sentry', 'Sentry initialized and handlers set.');
     }
 
     public function handleError($errno, $errstr, $errfile, $errline)
@@ -148,7 +127,7 @@ class ProcessWireSentry extends WireData implements Module
     public function handleException($exception)
     {
         // Debug: Log the exception message
-        wire('log')->save('sentry', 'Handling exception: ' . $exception->getMessage());
+        $this->logLocally('Handling exception: ' . $exception->getMessage());
 
         // Send exception to Sentry
         \Sentry\captureException($exception);
@@ -173,7 +152,7 @@ class ProcessWireSentry extends WireData implements Module
     public function captureNotices(HookEvent $event)
     {
         $notices = wire('notices');
-        wire('log')->save('sentry', 'Capturing notices: ' . count($notices));
+        $this->logLocally('Capturing notices: ' . count($notices));
         foreach ($notices as $notice) {
             $text = $notice instanceof NoticeError ? "Error" : "Message";
             if ($notice instanceof NoticeError) {
@@ -190,9 +169,15 @@ class ProcessWireSentry extends WireData implements Module
         $name = $event->arguments(1); // Log type (name)
 
         if ($name === 'errors' || $name === 'exceptions') {
-            wire('log')->save('sentry', 'Capturing log error: ' . $message);
-            // Capture the log message as an exception in Sentry
+            $this->logLocally('Capturing log error: ' . $message);
             \Sentry\captureMessage($message);
+        }
+    }
+
+    public function logLocally($message)
+    {
+        if ($this->wire('modules')->getConfig('ProcessWireSentry', 'local_log')) {
+            $this->wire('log')->save('sentry', $message);
         }
     }
 }

@@ -12,8 +12,10 @@ class ProcessWireSentryConfig extends ModuleConfig
         $projectID = $this->wire('modules')->getConfig('ProcessWireSentry', 'project_id');
         $organizationID = $this->wire('modules')->getConfig('ProcessWireSentry', 'organization_id');
         $authToken = $this->wire('modules')->getConfig('ProcessWireSentry', 'auth_token');
+        $debugMode = $this->wire('modules')->getConfig('ProcessWireSentry', 'debug_mode');
+        $localLog = $this->wire('modules')->getConfig('ProcessWireSentry', 'local_log');
 
-        $this->addConfigFields($dsn, $projectID, $organizationID, $authToken);
+        $this->addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog);
 
         if (!self::$nuxtInjected) {
             $this->add(
@@ -21,7 +23,7 @@ class ProcessWireSentryConfig extends ModuleConfig
                     array(
                         'type' => 'markup',
                         'label' => '',
-                        'value' => $this->renderNuxtContent($dsn, $projectID, $organizationID, $authToken)
+                        'value' => $this->renderNuxtContent($dsn, $projectID, $organizationID, $authToken, $debugMode)
                     )
                 )
             );
@@ -29,68 +31,89 @@ class ProcessWireSentryConfig extends ModuleConfig
         }
     }
 
-    private function addConfigFields($dsn, $projectID, $organizationID, $authToken)
+    private function addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog)
     {
         $this->add(
             array(
                 array(
-                    'name' => 'dsn',
-                    'type' => 'text',
-                    'label' => $this->_('Sentry DSN'),
-                    'description' => $this->_('Enter your Sentry DSN here'),
-                    'required' => true,
-                    'value' => $dsn
+                    'type' => 'fieldset',
+                    'label' => $this->_('Sentry Configuration'),
+                    'collapsed' => Inputfield::collapsedYes,
+                    'children' => array(
+                        array(
+                            'name' => 'dsn',
+                            'type' => 'text',
+                            'label' => $this->_('Sentry DSN'),
+                            'description' => $this->_('Enter your Sentry DSN here'),
+                            'required' => true,
+                            'value' => $dsn
+                        ),
+                        array(
+                            'name' => 'project_id',
+                            'type' => 'text',
+                            'label' => $this->_('Project ID'),
+                            'description' => $this->_('Enter your Sentry project ID here'),
+                            'required' => true,
+                            'value' => $projectID
+                        ),
+                        array(
+                            'name' => 'organization_id',
+                            'type' => 'text',
+                            'label' => $this->_('Organization ID'),
+                            'description' => $this->_('Enter your Sentry organization ID here'),
+                            'required' => true,
+                            'value' => $organizationID
+                        ),
+                        array(
+                            'name' => 'auth_token',
+                            'type' => 'text',
+                            'label' => $this->_('Auth Token'),
+                            'description' => $this->_('Enter your Sentry auth token here'),
+                            'required' => true,
+                            'value' => $authToken
+                        ),
+                    )
                 ),
                 array(
-                    'name' => 'project_id',
-                    'type' => 'text',
-                    'label' => $this->_('Project ID'),
-                    'description' => $this->_('Enter your Sentry project ID here'),
-                    'required' => true,
-                    'value' => $projectID
-                ),
-                array(
-                    'name' => 'organization_id',
-                    'type' => 'text',
-                    'label' => $this->_('Organization ID'),
-                    'description' => $this->_('Enter your Sentry organization ID here'),
-                    'required' => true,
-                    'value' => $organizationID
-                ),
-                array(
-                    'name' => 'auth_token',
-                    'type' => 'text',
-                    'label' => $this->_('Auth Token'),
-                    'description' => $this->_('Enter your Sentry auth token here'),
-                    'required' => true,
-                    'value' => $authToken
-                ),
-                array(
-                    'name' => 'traces_sample_rate',
-                    'type' => 'float',
-                    'label' => $this->_('Traces Sample Rate'),
-                    'description' => $this->_('Enter the traces sample rate for Sentry (e.g., 1.0 for 100% sampling, 0.5 for 50% sampling)'),
-                    'required' => true,
-                    'value' => 1.0
-                ),
-                array(
-                    'name' => 'view_events',
-                    'type' => 'markup',
-                    'label' => $this->_('View Sentry Events'),
-                    'description' => $this->_('The latest events sent to Sentry are displayed below.'),
-                    'collapsed' => Inputfield::collapsedNever,
-                    'value' => '<div id="sentry-events-container" data-dsn="' . $dsn . '" data-project-id="' . $projectID . '" data-organization-id="' . $organizationID . '" data-auth-token="' . $authToken . '"></div>',
+                    'type' => 'fieldset',
+                    'label' => $this->_('Advanced Settings'),
+                    'collapsed' => Inputfield::collapsedYes,
+                    'children' => array(
+                        array(
+                            'name' => 'traces_sample_rate',
+                            'type' => 'float',
+                            'label' => $this->_('Traces Sample Rate'),
+                            'description' => $this->_('Enter the traces sample rate for Sentry (e.g., 1.0 for 100% sampling, 0.5 for 50% sampling)'),
+                            'required' => true,
+                            'value' => 1.0
+                        ),
+                        array(
+                            'name' => 'debug_mode',
+                            'type' => 'checkbox',
+                            'label' => $this->_('Debug Mode'),
+                            'description' => $this->_('Enable debug mode for additional logging'),
+                            'value' => $debugMode
+                        ),
+                        array(
+                            'name' => 'local_log',
+                            'type' => 'checkbox',
+                            'label' => $this->_('Log Events Locally'),
+                            'description' => $this->_('Enable local event logging, in most cases this should be disabled.'),
+                            'value' => $localLog
+                        ),
+                        // Add more fields within the collapsible section as needed
+                    ),
                 ),
                 array(
                     'type' => 'markup',
                     'label' => '',
-                    'value' => $this->renderNuxtContent($dsn, $projectID, $organizationID, $authToken)
+                    'value' => $this->renderNuxtContent($dsn, $projectID, $organizationID, $authToken, $debugMode)
                 )
             )
         );
     }
 
-    private function renderNuxtContent($dsn, $projectID, $organizationID, $authToken)
+    private function renderNuxtContent($dsn, $projectID, $organizationID, $authToken, $debugMode)
     {
         // Path to the Nuxt build index.html
         $indexHtmlPath = $this->wire('config')->paths->siteModules . 'ProcessWireSentry/event-viewer/dist/index.html';
@@ -122,12 +145,12 @@ class ProcessWireSentryConfig extends ModuleConfig
                         SENTRY_DSN: "' . $dsn . '",
                         SENTRY_PROJECT_ID: "' . $projectID . '",
                         SENTRY_ORGANIZATION_ID: "' . $organizationID . '",
-                        SENTRY_AUTH_TOKEN: "' . $authToken . '"
+                        SENTRY_AUTH_TOKEN: "' . $authToken . '",
+                        DEBUG_MODE: ' . ($debugMode ? 'true' : 'false') . '
                     },
                     app: {
-                        baseURL: "' . $baseUrl . '",
-                        buildAssetsDir: "/_nuxt/",
-                        cdnURL: ""
+                      
+                        buildAssetsDir: "/event-viewer/dist/",  
                     }
                 };
             </script>
