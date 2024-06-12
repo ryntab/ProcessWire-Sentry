@@ -26,7 +26,7 @@ class ProcessWireSentry extends WireData implements Module
             'autoload' => true
         ];
     }
-    
+
     public function init()
     {
         // Include Composer's autoload file
@@ -36,6 +36,13 @@ class ProcessWireSentry extends WireData implements Module
         $logger = new Logger('sentry');
         $logger->pushHandler(new StreamHandler('php://stderr', Logger::DEBUG));
 
+        // Get the DSN and traces_sample_rate from the module configuration
+        $dsn = $this->wire('modules')->getConfig('ProcessWireSentry', 'dsn');
+        $debug = $this->wire('modules')->getConfig('ProcessWireSentry', 'debug_mode');
+        $localLog = $this->wire('modules')->getConfig('ProcessWireSentry', 'local_log');
+        $tracesSampleRate = $this->wire('modules')->getConfig('ProcessWireSentry', 'traces_sample_rate');
+        $jsCDN = $this->wire('modules')->getConfig('ProcessWireSentry', 'js_cdn');
+
         // Sentry initialization with enhanced logging
         \Sentry\init([
             'dsn' => $dsn,
@@ -43,20 +50,19 @@ class ProcessWireSentry extends WireData implements Module
             'logger' => $logger,
         ]);
 
-        // Get the DSN and traces_sample_rate from the module configuration
-        $dsn = $this->wire('modules')->getConfig('ProcessWireSentry', 'dsn');
-        $debug = $this->wire('modules')->getConfig('ProcessWireSentry', 'debug_mode');
-        $localLog = $this->wire('modules')->getConfig('ProcessWireSentry', 'local_log');
-        $tracesSampleRate = $this->wire('modules')->getConfig('ProcessWireSentry', 'traces_sample_rate');
+        if ($jsCDN) {
+            //$this->wire('config')->scripts->add($jsCDN);
+            echo '<script src="' . $jsCDN . '"></script>';
+        }
 
         // Debug: Check if DSN and traces_sample_rate are being set
         if (empty($dsn)) {
-            wire('log')->save('sentry', 'DSN is not set in the configuration');
+            $this->logLocally('DSN is not set in the configuration');
             return;
         }
 
         if (empty($tracesSampleRate)) {
-            wire('log')->save('sentry', 'traces_sample_rate is not set in the configuration');
+            $this->logLocally('traces_sample_rate is not set in the configuration');
             return;
         }
 
@@ -65,7 +71,7 @@ class ProcessWireSentry extends WireData implements Module
                 throw new \Exception('Test exception from ProcessWireSentry module');
             } catch (\Exception $e) {
                 \Sentry\captureException($e);
-                wire('log')->save('sentry', 'Test exception sent to Sentry.');
+                $this->logLocally('Debug mode enabled, exception captured');
             }
         }
 
