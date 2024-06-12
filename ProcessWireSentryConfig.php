@@ -15,7 +15,9 @@ class ProcessWireSentryConfig extends ModuleConfig
         $debugMode = $this->wire('modules')->getConfig('ProcessWireSentry', 'debug_mode');
         $localLog = $this->wire('modules')->getConfig('ProcessWireSentry', 'local_log');
 
-        $this->addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog);
+        $jsCDN = $this->wire('modules')->getConfig('ProcessWireSentry', 'js_cdn');
+
+        $this->addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog, $jsCDN);
 
         if (!self::$nuxtInjected) {
             $this->add(
@@ -31,15 +33,20 @@ class ProcessWireSentryConfig extends ModuleConfig
         }
     }
 
-    private function addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog)
+    private function addConfigFields($dsn, $projectID, $organizationID, $authToken, $debugMode, $localLog, $jsCDN)
     {
         $this->add(
             array(
                 array(
                     'type' => 'fieldset',
-                    'label' => $this->_('Sentry Configuration'),
+                    'label' => $this->_('Sentry Backend: PHP Configuration'),
                     'collapsed' => Inputfield::collapsedYes,
                     'children' => array(
+                        array(
+                            'type' => 'markup',
+                            'label' => '',
+                            'value' => '<label>Configure your Sentry PHP Project. These settings will be used to emit PHP errors and exceptions to Sentry.</label>'
+                        ),
                         array(
                             'name' => 'dsn',
                             'type' => 'text',
@@ -71,6 +78,26 @@ class ProcessWireSentryConfig extends ModuleConfig
                             'description' => $this->_('Enter your Sentry auth token here'),
                             'required' => true,
                             'value' => $authToken
+                        ),
+                    )
+                ),
+                array(
+                    'type' => 'fieldset',
+                    'label' => $this->_('Sentry Frontend: Javascript Configuration'),
+                    'collapsed' => Inputfield::collapsedYes,
+                    'children' => array(
+                        array(
+                            'type' => 'markup',
+                            'label' => '',
+                            'value' => '<label>Configure your Sentry PHP Project. These settings will be used to emit PHP errors and exceptions to Sentry.</label>'
+                        ),
+                        array(
+                            'name' => 'js_cdn',
+                            'type' => 'text',
+                            'label' => $this->_('Sentry JS CDN'),
+                            'description' => $this->_('Enter your Sentry JS CDN here'),
+                            'required' => true,
+                            'value' => $jsCDN
                         ),
                     )
                 ),
