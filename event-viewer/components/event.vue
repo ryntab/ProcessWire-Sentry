@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col border-2 align-middle p-4 relative" >
     <div class="flex flex-row space-x-2 border-b py-1 text-sm ">
-      <span class="px-2 bg-orange-100 rounded-md text-orange-600"><pre>{{ readableDate }}</pre></span>
+      <span class="px-2 bg-orange-100 rounded-md text-orange-600">{{ readableDate }}</span>
       <span class="font-semibold">..{{ event.title }}</span>
       <span class="px-2 bg-gray-100 rounded-md text-gray-400">ID: {{ event.eventID }}</span>
     </div>
