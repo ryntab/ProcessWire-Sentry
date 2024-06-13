@@ -67,7 +67,7 @@ class ProcessWireSentryConfig extends ModuleConfig
                             'name' => 'organization_id',
                             'type' => 'text',
                             'label' => $this->_('Organization ID'),
-                            'description' => $this->_('Enter your Sentry organization ID here'),
+                            'description' => $this->_('Enter your Sentry organization ID or Slug here (e.g., "sentry" for sentry.io/sentry)'),
                             'required' => true,
                             'value' => $organizationID
                         ),
@@ -96,7 +96,7 @@ class ProcessWireSentryConfig extends ModuleConfig
                             'type' => 'text',
                             'label' => $this->_('Sentry JS CDN'),
                             'description' => $this->_('Enter your Sentry JS CDN here'),
-                            'required' => true,
+                            'required' => false,
                             'value' => $jsCDN
                         ),
                     )
@@ -133,7 +133,8 @@ class ProcessWireSentryConfig extends ModuleConfig
                 ),
                 array(
                     'type' => 'markup',
-                    'label' => '',
+                    'collapsed' => Inputfield::collapsedYes,
+                    'label' => 'Event Viewer',
                     'value' => $this->renderNuxtContent($dsn, $projectID, $organizationID, $authToken, $debugMode)
                 )
             )
@@ -142,6 +143,11 @@ class ProcessWireSentryConfig extends ModuleConfig
 
     private function renderNuxtContent($dsn, $projectID, $organizationID, $authToken, $debugMode)
     {
+
+        if (!$dsn || !$projectID || !$organizationID || !$authToken) {
+            return '<div class="ui message warning">Please configure your Sentry DSN, Project ID, Organization ID, and Auth Token in the module settings to display event logging.</div>';
+        }
+
         // Path to the Nuxt build index.html
         $indexHtmlPath = $this->wire('config')->paths->siteModules . 'ProcessWireSentry/event-viewer/dist/index.html';
         $indexHtmlContent = file_get_contents($indexHtmlPath);
