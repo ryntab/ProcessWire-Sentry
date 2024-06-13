@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden">
+  <div class="overflow-hidden w-full relative">
     <div class="flex justify-between absolute right-0 m-2 z-20 align-middle w-full px-4">
       <div>
         <span class="font-medium">Issues in the last {{ timeRange }}</span>
