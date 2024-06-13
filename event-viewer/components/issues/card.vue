@@ -36,7 +36,7 @@
         >
           {{ issue.priority }}
         </span>
-        <a target="blank" :href="issue.permalink">
+        <a target="_blank" @click="openInNewTab(issue.permalink)">
           <button
             class="px-2 py-1 bg-gray-100 rounded-md text-gray-400 space-x-1 align-middle"
           >
@@ -92,6 +92,10 @@ export default {
   methods: {
     readableDate(date) {
       return new Date(date).toDateString();
+    },
+    openInNewTab(url) {
+      const win = window.open(url, "_blank");
+      win.focus();
     },
   },
   computed: {
