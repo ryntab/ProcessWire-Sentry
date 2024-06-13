@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden w-full relative">
+  <div class="event-viewer overflow-hidden w-full relative">
     <div class="flex justify-between absolute right-0 m-2 z-20 align-middle w-full px-4">
       <div>
         <span class="font-medium">Issues in the last {{ timeRange }}</span>
@@ -124,3 +124,44 @@ export default {
   },
 };
 </script>
+<style>
+/* WebKit browsers (Chrome, Safari) */
+.event-viewer ::-webkit-scrollbar {
+  width: 5px; /* Width of the scrollbar */
+  height: 5px; /* Height of the scrollbar */
+}
+
+.event-viewer ::-webkit-scrollbar-track {
+  background: transparent; /* Background of the scrollbar track */
+}
+
+.event-viewer ::-webkit-scrollbar-thumb {
+  background: #e6e6e6; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+}
+
+.event-viewer ::-webkit-scrollbar-thumb:hover {
+  background: #8b8b8b; /* Darker color when hovering over the scrollbar thumb */
+}
+
+/* Firefox */
+.event-viewer * {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #e6e6e6 transparent; /* Thumb color and track color */
+}
+
+.event-viewer *::-webkit-scrollbar-track {
+  background: transparent; /* Background of the scrollbar track */
+}
+
+.event-viewer *::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the scrollbar thumb */
+  border: 3px solid transparent; /* Extra space around the thumb */
+}
+
+.event-viewer *::-webkit-scrollbar-thumb:hover {
+  background-color: #969696; /* Darker color when hovering over the scrollbar thumb */
+}
+
+</style>
