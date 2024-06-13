@@ -1,5 +1,7 @@
 ![ProcessWire Sentry](/Banner.jpg)
-# ProcessWire Sentry Integration Module
+# ProcessWire Sentry Integration Module 
+![example workflow](https://github.com/github/docs/actions/workflows/generate-event-viewer.yml/badge.svg)
+
 
 This ProcessWire module integrates Sentry error tracking into your ProcessWire site, with additional support for viewing live Sentry events.
 
