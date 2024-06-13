@@ -1,4 +1,4 @@
-name: Generate Nuxt Site
+name: Build PHP and Nuxt Projects
 
 on:
   push:
@@ -13,12 +13,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Set up PHP and Composer
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.0' # specify your PHP version
+          tools: composer
+
+      - name: Install PHP dependencies
+        run: composer install
+
+      # Set up Node.js and build Nuxt project
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install Nuxt dependencies
         run: |
           cd event-viewer
           npm install
@@ -28,8 +39,20 @@ jobs:
           cd event-viewer
           npm run generate
 
-      - name: Upload generated site
+      - name: Upload generated Nuxt site
         uses: actions/upload-artifact@v3
         with:
           name: generated-site
           path: event-viewer/dist
+
+      # If you have any build steps for the PHP project, add them here
+      # - name: Build PHP project
+      #   run: |
+      #     # Add your PHP build commands here, if any
+
+      # Upload PHP project if needed
+      - name: Upload PHP project
+        uses: actions/upload-artifact@v3
+        with:
+          name: php-project
+          path: . # Adjust this path if you want to upload specific files or directories
