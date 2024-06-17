@@ -1,4 +1,4 @@
-
+![ProcessWire Sentry](/docs/banner.jpg)
 # ProcessWire Sentry Integration Module
 
 ![example workflow](https://github.com/ryntab/ProcessWire-Sentry/actions/workflows/build.yml/badge.svg)
