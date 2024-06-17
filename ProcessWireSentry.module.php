@@ -19,9 +19,9 @@ class ProcessWireSentry extends WireData implements Module
             'title' => 'Sentry Integration',
             'version' => 1,
             'summary' => 'Sentry integration for error logging in ProcessWire',
-            'author' => 'Your Name',
+            'author' => 'https://github.com/ryntab',
             'icon' => 'bug',
-            'requires' => ['PHP>=7.2', 'ProcessWire>=3.0.0'],
+            'requires' => ['PHP>=8.2', 'ProcessWire>=3.0.0'],
             'singular' => true,
             'autoload' => true
         ];
