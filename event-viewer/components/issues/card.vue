@@ -9,7 +9,7 @@
           class="px-2 bg-purple-100 rounded-md capitalize"
           :class="priorityColor"
         >
-          <pre>{{ issue.priority }}</pre>
+          {{ issue.priority }}
         </span>
         <span class="font-semibold truncate max-w-xs w-auto">{{
           issue.title
