@@ -149,15 +149,15 @@ class ProcessWireSentryConfig extends ModuleConfig
         }
 
         // Path to the Nuxt build index.html
-        $indexHtmlPath = $this->wire('config')->paths->siteModules . 'ProcessWireSentry/event-viewer/dist/index.html';
+        $indexHtmlPath = $this->wire('config')->paths->siteModules . 'ProcessWire-Sentry/event-viewer/dist/index.html';
         $indexHtmlContent = file_get_contents($indexHtmlPath);
 
         // Get the module directory URL
-        $baseUrl = $this->wire('config')->urls->siteModules . 'ProcessWireSentry/event-viewer/dist/';
+        $baseUrl = $this->wire('config')->urls->siteModules . 'ProcessWire-Sentry/event-viewer/dist/';
 
         // Prepend base URL to all href and src attributes
         $indexHtmlContent = preg_replace('/(href|src)="\/_nuxt\//', '$1="' . $baseUrl . '_nuxt/', $indexHtmlContent);
-        $indexHtmlContent = preg_replace('/(href|src)="\/ProcessWireSentry\/event-viewer\/dist\//', '$1="' . $baseUrl, $indexHtmlContent);
+        $indexHtmlContent = preg_replace('/(href|src)="\/ProcessWire-Sentry\/event-viewer\/dist\//', '$1="' . $baseUrl, $indexHtmlContent);
 
         // Extract the head and body content
         preg_match('/<head>(.*?)<\/head>/s', $indexHtmlContent, $headMatches);
