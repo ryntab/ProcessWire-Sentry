@@ -1,4 +1,4 @@
-![ProcessWire Sentry](/Banner.jpg)
+![ProcessWire Sentry](/docs/Banner.jpg)
 # ProcessWire Sentry Integration Module 
 ![example workflow](https://github.com/ryntab/ProcessWire-Sentry/actions/workflows/generate-event-viewer.yml/badge.svg)
 
@@ -25,3 +25,7 @@ Go to the module settings in the ProcessWire admin and configure the following f
 Usage
 
 Once the module is installed and configured, you can view the latest events sent to Sentry directly in the ProcessWire admin interface. Navigate to the module configuration page, and the Nuxt.js application will display the events.
+
+## Event Viewer
+
+![ProcessWire Sentry](/docs/event-viewer-demo.jpg)
