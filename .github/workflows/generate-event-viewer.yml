@@ -50,9 +50,17 @@ jobs:
       #   run: |
       #     # Add your PHP build commands here, if any
 
-      # Upload PHP project if needed
+      # Archive PHP project files before uploading
+      - name: Create archive of PHP project
+        run: zip -r php-project.zip .
+
+      # Upload archived PHP project
       - name: Upload PHP project
         uses: actions/upload-artifact@v3
         with:
           name: php-project
-          path: . # Adjust this path if you want to upload specific files or directories
+          path: php-project.zip
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
