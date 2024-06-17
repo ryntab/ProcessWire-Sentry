@@ -51,8 +51,10 @@ class ProcessWireSentry extends WireData implements Module
         ]);
 
         if ($jsCDN) {
-            //$this->wire('config')->scripts->add($jsCDN);
-            echo '<script src="' . $jsCDN . '"></script>';
+            // Check if the current request is not in the admin backend
+            if (!$this->wire('config')->ajax && !$this->wire('config')->admin) {
+                $this->wire('config')->scripts->add($jsCDN);
+            }
         }
 
         // Debug: Check if DSN and traces_sample_rate are being set
