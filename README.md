@@ -49,7 +49,7 @@ Once the module is installed and configured, you can view the latest events sent
 
 ## Troubleshooting
 - If you encounter any issues with the module, please check the [issues](https://github.com/ryntab/ProcessWire-Sentry/issues) page to see if it has already been reported. If not, feel free to open a new issue with a detailed description of the problem.
-- 
+  
 ## Event Viewer
 
 ![ProcessWire Sentry](/docs/event-viewer-demo.gif)
