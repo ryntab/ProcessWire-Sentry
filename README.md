@@ -5,8 +5,6 @@
 
 This ProcessWire module integrates Sentry error tracking into your ProcessWire back-end, with additional support for front-end error tracing through the Sentry JS SDK.
 
-## 🚧 This module is not production ready
-
 ## Table of Contents
 - [Features](#features)
 - [Prerequisites](#prerequisites)
