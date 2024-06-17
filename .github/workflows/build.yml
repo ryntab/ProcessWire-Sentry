@@ -3,10 +3,10 @@ name: Build PHP and Nuxt Projects
 on:
   push:
     branches:
-      - master # or your default branch
+      - master
   pull_request:
     branches:
-      - master # or your default branch
+      - master
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Necessary to fetch all history for pushing tags
+          fetch-depth: 0
 
       # Cache Composer dependencies
       - name: Cache Composer dependencies
@@ -35,6 +35,9 @@ jobs:
 
       - name: Install PHP dependencies
         run: composer install
+
+      - name: Update PHP dependencies
+        run: composer update
 
       # Cache Node.js dependencies
       - name: Cache Node.js modules
@@ -69,7 +72,7 @@ jobs:
           git add dist
           git commit -m "Update generated Nuxt site"
           git push origin master
-        if: github.ref == 'refs/heads/master' # Only push changes on master
+        if: github.ref == 'refs/heads/master'
 
       - name: Upload generated Nuxt site
         uses: actions/upload-artifact@v3
