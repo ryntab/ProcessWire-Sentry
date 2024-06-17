@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master # or your default branch
+  pull_request:
+    branches:
+      - master # or your default branch
 
 jobs:
   build:
@@ -12,16 +15,34 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Necessary to fetch all history for pushing tags
+
+      # Cache Composer dependencies
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       # Set up PHP and Composer
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0' # specify your PHP version
+          php-version: '8.0'
           tools: composer
 
       - name: Install PHP dependencies
         run: composer install
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-node-
 
       # Set up Node.js and build Nuxt project
       - name: Set up Node.js
@@ -39,16 +60,22 @@ jobs:
           cd event-viewer
           npm run generate
 
+      # Commit and push generated Nuxt site
+      - name: Commit and push generated Nuxt site
+        run: |
+          cd event-viewer
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist
+          git commit -m "Update generated Nuxt site"
+          git push origin master
+        if: github.ref == 'refs/heads/master' # Only push changes on master
+
       - name: Upload generated Nuxt site
         uses: actions/upload-artifact@v3
         with:
           name: generated-site
           path: event-viewer/dist
-
-      # If you have any build steps for the PHP project, add them here
-      # - name: Build PHP project
-      #   run: |
-      #     # Add your PHP build commands here, if any
 
       # Archive PHP project files before uploading
       - name: Create archive of PHP project
